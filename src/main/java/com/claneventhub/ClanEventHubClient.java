@@ -158,7 +158,7 @@ public class ClanEventHubClient
 				.setType(MultipartBody.FORM)
 				.addFormDataPart("image", "screenshot.png",
 					RequestBody.create(MediaType.parse("image/png"), imageBytes))
-				.addFormDataPart("tileId", String.valueOf(tileId))
+				.addFormDataPart("tile_id", String.valueOf(tileId))
 				.addFormDataPart("submittedBy", submittedBy)
 				.build();
 

@@ -102,7 +102,7 @@ class ClanEventHubPanel extends PluginPanel
 		header.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		header.setBorder(new EmptyBorder(8, 10, 8, 10));
 
-		JLabel title = new JLabel("Clan Event Hub");
+		JLabel title = new JLabel("Mercenary PvM");
 		title.setFont(FontManager.getRunescapeBoldFont());
 		title.setForeground(ColorScheme.BRAND_ORANGE);
 		title.setAlignmentX(LEFT_ALIGNMENT);
@@ -117,6 +117,12 @@ class ClanEventHubPanel extends PluginPanel
 		playerNameLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		playerNameLabel.setAlignmentX(LEFT_ALIGNMENT);
 		header.add(playerNameLabel);
+
+		JButton reloadButton = new JButton("Reload");
+		styleButton(reloadButton);
+		reloadButton.setAlignmentX(LEFT_ALIGNMENT);
+		reloadButton.addActionListener(e -> onClanDetected());
+		header.add(reloadButton);
 
 		add(header, BorderLayout.NORTH);
 
@@ -1482,7 +1488,7 @@ class ClanEventHubPanel extends PluginPanel
 
 	private void showMessage(String message)
 	{
-		JOptionPane.showMessageDialog(this, message, "Clan Event Hub", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(this, message, "Mercenary PvM", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private static String escapeHtml(String text)

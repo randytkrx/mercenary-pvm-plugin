@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,9 +31,9 @@ import net.runelite.client.util.ImageUtil;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Clan Event Hub",
+	name = "Mercenary PvM",
 	description = "Track clan events, bingo, splits, and drops via your clan's server",
-	tags = {"clan", "events", "bingo", "drops", "splits", "loot", "proof"}
+	tags = {"mercenary", "pvm", "clan", "events", "bingo", "drops", "splits", "loot", "proof"}
 )
 public class ClanEventHubPlugin extends Plugin
 {
@@ -83,7 +84,7 @@ public class ClanEventHubPlugin extends Plugin
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "icon.png");
 
 		navButton = NavigationButton.builder()
-			.tooltip("Clan Event Hub")
+			.tooltip("Mercenary PvM")
 			.icon(icon)
 			.priority(7)
 			.panel(panel)
@@ -115,19 +116,7 @@ public class ClanEventHubPlugin extends Plugin
 	{
 		if (event.getGameState() == net.runelite.api.GameState.LOGGED_IN)
 		{
-			executor.execute(() ->
-			{
-				try
-				{
-					Thread.sleep(2000);
-				}
-				catch (InterruptedException e)
-				{
-					Thread.currentThread().interrupt();
-					return;
-				}
-				checkClanMembership();
-			});
+			executor.schedule(this::checkClanMembership, 2, TimeUnit.SECONDS);
 		}
 	}
 
