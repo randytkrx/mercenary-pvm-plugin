@@ -2,34 +2,35 @@
 
 A RuneLite plugin for clans to track events, bingo boards, loot splits, and drop proofs through their own server.
 
-> **Privacy:** This plugin does not send any data unless the user explicitly configures external endpoints. All communication is initiated by user actions.
+This plugin is not affiliated with or endorsed by Jagex.
+
+> **Privacy:**
+> This plugin does not send any data unless the user explicitly configures external endpoints in the settings.
+> No data is collected, stored, or transmitted by default.
+> All communication is initiated by explicit user actions (e.g., submitting proof, joining events).
+> All authentication tokens are stored locally within the RuneLite client and are never shared except with user-configured endpoints.
 
 ## Features
 
-### Event Tracker
+### Event Tracking & Bingo
 - View all active clan events (survivor, bingo, region conquest, monopoly)
 - See current tasks, deadlines, and countdown timers
-- Join events and track your status and points
+- Join events and track your status, points, and lifelines
 - Submit proof screenshots directly from the game
-- Use lifelines when available
-
-### Bingo Boards
-- Browse active bingo boards with tile names and point values
+- Browse bingo boards with tile names and point values
 - Auto-detects your team by matching your in-game name
-- See which tiles are completed vs incomplete
 - Screenshot and submit tile proofs in one click
 
-### Split Tracker
+### Split Tracking
 - Submit loot splits for Discord approval
 - Supports shorthand amounts (500m, 1.5b, 200k)
 - Optionally attach a screenshot as proof
 - Your IGN is detected automatically from the game
 
-### Drop Uploads (Hall of Fame)
-- Manually submit drops with a screenshot
+### Drop Tracking
+- Manually submit drops with a screenshot to your clan's Hall of Fame
 - Browse recent clan drops
-- Auto-screenshot on valuable drops and collection log entries
-- Optional auto-submit to your clan's Hall of Fame
+- Automatically captures screenshots on valuable drops and collection log entries (local only). Optional auto-submit can be enabled in settings.
 
 ### Clan Auto-Detection
 - Automatically detects when you're in your configured clan
