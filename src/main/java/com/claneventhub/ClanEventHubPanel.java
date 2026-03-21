@@ -7,7 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import javax.swing.BorderFactory;
@@ -31,6 +31,8 @@ import net.runelite.client.ui.PluginPanel;
 @Slf4j
 class ClanEventHubPanel extends PluginPanel
 {
+	private static final int PANEL_WIDTH = PluginPanel.PANEL_WIDTH - 17;
+
 	private final ClanEventHubPlugin plugin;
 	private final ClanEventHubConfig config;
 
@@ -48,29 +50,28 @@ class ClanEventHubPanel extends PluginPanel
 	private final JLabel pointsLabel = new JLabel("");
 	private final JLabel statusLabel = new JLabel("");
 	private final JLabel submissionStatusLabel = new JLabel("");
-	private final JButton joinButton = new JButton("Join Event");
-	private final JButton screenshotSubmitButton = new JButton("Screenshot & Submit Proof");
+	private final JButton joinButton = new JButton("Join");
+	private final JButton screenshotSubmitButton = new JButton("Submit Proof");
 	private final JButton lifelineButton = new JButton("Use Lifeline");
 
 	// Bingo tab
 	private final JPanel bingoListPanel = new JPanel();
-	private final JPanel bingoDetailPanel = new JPanel();
-	private final JLabel bingoNameLabel = new JLabel("Select a bingo board");
+	private final JLabel bingoNameLabel = new JLabel("Select a board");
 	private final JPanel bingoTilesPanel = new JPanel();
 	private final JComboBox<String> bingoTileSelector = new JComboBox<>();
-	private final JButton bingoSubmitButton = new JButton("Screenshot & Submit Tile");
+	private final JButton bingoSubmitButton = new JButton("Submit Tile Proof");
 
 	// Drops tab
 	private final JPanel dropsListPanel = new JPanel();
 	private final JTextField dropTitleField = new JTextField();
-	private final JButton submitDropButton = new JButton("Screenshot & Submit Drop");
+	private final JButton submitDropButton = new JButton("Submit Drop");
 	private final JButton refreshDropsButton = new JButton("Refresh");
 
 	// Split tab
 	private final JTextField splitAmountField = new JTextField();
 	private final JTextField splitWithField = new JTextField();
 	private final JButton splitSubmitButton = new JButton("Submit Split");
-	private final JButton splitScreenshotButton = new JButton("Screenshot & Submit Split");
+	private final JButton splitScreenshotButton = new JButton("With Screenshot");
 	private final JLabel splitStatusLabel = new JLabel("");
 
 	// Chat tab
@@ -121,7 +122,9 @@ class ClanEventHubPanel extends PluginPanel
 		JButton reloadButton = new JButton("Reload");
 		styleButton(reloadButton);
 		reloadButton.setAlignmentX(LEFT_ALIGNMENT);
+		reloadButton.setMaximumSize(new Dimension(PANEL_WIDTH, 28));
 		reloadButton.addActionListener(e -> onClanDetected());
+		header.add(createSpacer(4));
 		header.add(reloadButton);
 
 		add(header, BorderLayout.NORTH);
@@ -130,6 +133,7 @@ class ClanEventHubPanel extends PluginPanel
 		JTabbedPane tabs = new JTabbedPane();
 		tabs.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		tabs.setForeground(Color.WHITE);
+		tabs.setFont(FontManager.getRunescapeSmallFont());
 
 		tabs.addTab("Events", buildEventsTab());
 		tabs.addTab("Bingo", buildBingoTab());
@@ -146,25 +150,21 @@ class ClanEventHubPanel extends PluginPanel
 	{
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 
-		// Top: event list
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 		topPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-		JLabel eventsHeader = new JLabel("Active Events");
-		eventsHeader.setFont(FontManager.getRunescapeBoldFont());
-		eventsHeader.setForeground(ColorScheme.BRAND_ORANGE);
-		eventsHeader.setAlignmentX(LEFT_ALIGNMENT);
+		JLabel eventsHeader = sectionHeader("Active Events");
 		topPanel.add(eventsHeader);
-		topPanel.add(createSpacer(5));
+		topPanel.add(createSpacer(4));
 
 		eventsListPanel.setLayout(new BoxLayout(eventsListPanel, BoxLayout.Y_AXIS));
 		eventsListPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		eventsListPanel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(eventsListPanel);
-		topPanel.add(createSpacer(10));
+		topPanel.add(createSpacer(8));
 
 		// Event detail
 		eventNameLabel.setFont(FontManager.getRunescapeBoldFont());
@@ -172,18 +172,16 @@ class ClanEventHubPanel extends PluginPanel
 		eventNameLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(eventNameLabel);
 
+		eventStatusLabel.setFont(FontManager.getRunescapeSmallFont());
 		eventStatusLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		eventStatusLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(eventStatusLabel);
-		topPanel.add(createSpacer(5));
+		topPanel.add(createSpacer(6));
 
-		JLabel taskHeader = new JLabel("Current Task");
-		taskHeader.setFont(FontManager.getRunescapeSmallFont());
-		taskHeader.setForeground(ColorScheme.BRAND_ORANGE);
-		taskHeader.setAlignmentX(LEFT_ALIGNMENT);
-		topPanel.add(taskHeader);
+		topPanel.add(sectionHeader("Current Task"));
+		topPanel.add(createSpacer(2));
 
-		taskTitleLabel.setFont(FontManager.getRunescapeBoldFont());
+		taskTitleLabel.setFont(FontManager.getRunescapeSmallFont());
 		taskTitleLabel.setForeground(Color.WHITE);
 		taskTitleLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(taskTitleLabel);
@@ -194,55 +192,61 @@ class ClanEventHubPanel extends PluginPanel
 		taskDescArea.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		taskDescArea.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		taskDescArea.setFont(FontManager.getRunescapeSmallFont());
-		taskDescArea.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		taskDescArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
 		taskDescArea.setAlignmentX(LEFT_ALIGNMENT);
-		taskDescArea.setMaximumSize(new Dimension(Integer.MAX_VALUE, 80));
+		taskDescArea.setMaximumSize(new Dimension(PANEL_WIDTH, 70));
 		topPanel.add(taskDescArea);
-		topPanel.add(createSpacer(5));
+		topPanel.add(createSpacer(4));
 
-		countdownLabel.setFont(FontManager.getRunescapeBoldFont());
+		countdownLabel.setFont(FontManager.getRunescapeSmallFont());
 		countdownLabel.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
 		countdownLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(countdownLabel);
-		topPanel.add(createSpacer(5));
+		topPanel.add(createSpacer(4));
 
+		statusLabel.setFont(FontManager.getRunescapeSmallFont());
 		statusLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		statusLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(statusLabel);
 
+		pointsLabel.setFont(FontManager.getRunescapeSmallFont());
 		pointsLabel.setForeground(ColorScheme.GRAND_EXCHANGE_PRICE);
 		pointsLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(pointsLabel);
 
+		submissionStatusLabel.setFont(FontManager.getRunescapeSmallFont());
 		submissionStatusLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		submissionStatusLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(submissionStatusLabel);
-		topPanel.add(createSpacer(10));
+		topPanel.add(createSpacer(8));
 
-		// Action buttons
-		JPanel actionRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-		actionRow.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		actionRow.setAlignmentX(LEFT_ALIGNMENT);
+		// Buttons stacked vertically
+		JPanel buttonGrid = new JPanel(new GridLayout(0, 2, 4, 4));
+		buttonGrid.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		buttonGrid.setAlignmentX(LEFT_ALIGNMENT);
+		buttonGrid.setMaximumSize(new Dimension(PANEL_WIDTH, 60));
 
 		styleButton(joinButton);
+		buttonGrid.add(joinButton);
 		joinButton.addActionListener(e -> onJoinEvent());
-		actionRow.add(joinButton);
 
 		styleButton(screenshotSubmitButton);
+		buttonGrid.add(screenshotSubmitButton);
 		screenshotSubmitButton.addActionListener(e -> onScreenshotAndSubmitProof());
-		actionRow.add(screenshotSubmitButton);
 
-		topPanel.add(actionRow);
-		topPanel.add(createSpacer(5));
+		topPanel.add(buttonGrid);
+		topPanel.add(createSpacer(4));
 
 		styleButton(lifelineButton);
 		lifelineButton.setAlignmentX(LEFT_ALIGNMENT);
+		lifelineButton.setMaximumSize(new Dimension(PANEL_WIDTH, 28));
 		lifelineButton.addActionListener(e -> onUseLifeline());
 		topPanel.add(lifelineButton);
 
 		JScrollPane scroll = new JScrollPane(topPanel);
 		scroll.setBorder(null);
 		scroll.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		scroll.getVerticalScrollBar().setUnitIncrement(16);
 		panel.add(scroll, BorderLayout.CENTER);
 
 		return panel;
@@ -254,58 +258,113 @@ class ClanEventHubPanel extends PluginPanel
 	{
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 
 		JPanel topPanel = new JPanel();
 		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 		topPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-		JLabel bingoHeader = new JLabel("Bingo Boards");
-		bingoHeader.setFont(FontManager.getRunescapeBoldFont());
-		bingoHeader.setForeground(ColorScheme.BRAND_ORANGE);
-		bingoHeader.setAlignmentX(LEFT_ALIGNMENT);
-		topPanel.add(bingoHeader);
-		topPanel.add(createSpacer(5));
+		topPanel.add(sectionHeader("Bingo Boards"));
+		topPanel.add(createSpacer(4));
 
 		bingoListPanel.setLayout(new BoxLayout(bingoListPanel, BoxLayout.Y_AXIS));
 		bingoListPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		bingoListPanel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(bingoListPanel);
-		topPanel.add(createSpacer(10));
+		topPanel.add(createSpacer(8));
 
-		// Board detail
 		bingoNameLabel.setFont(FontManager.getRunescapeBoldFont());
 		bingoNameLabel.setForeground(Color.WHITE);
 		bingoNameLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(bingoNameLabel);
-		topPanel.add(createSpacer(5));
+		topPanel.add(createSpacer(4));
 
 		bingoTilesPanel.setLayout(new BoxLayout(bingoTilesPanel, BoxLayout.Y_AXIS));
 		bingoTilesPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		bingoTilesPanel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(bingoTilesPanel);
-		topPanel.add(createSpacer(10));
+		topPanel.add(createSpacer(8));
 
-		// Submit proof for tile
-		JLabel submitLabel = new JLabel("Submit proof for tile:");
+		JLabel submitLabel = new JLabel("Submit proof:");
+		submitLabel.setFont(FontManager.getRunescapeSmallFont());
 		submitLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 		submitLabel.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(submitLabel);
+		topPanel.add(createSpacer(2));
 
-		bingoTileSelector.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+		bingoTileSelector.setMaximumSize(new Dimension(PANEL_WIDTH, 25));
 		bingoTileSelector.setAlignmentX(LEFT_ALIGNMENT);
 		topPanel.add(bingoTileSelector);
-		topPanel.add(createSpacer(5));
+		topPanel.add(createSpacer(4));
 
 		styleButton(bingoSubmitButton);
 		bingoSubmitButton.setAlignmentX(LEFT_ALIGNMENT);
+		bingoSubmitButton.setMaximumSize(new Dimension(PANEL_WIDTH, 28));
 		bingoSubmitButton.addActionListener(e -> onSubmitBingoProof());
 		topPanel.add(bingoSubmitButton);
 
 		JScrollPane scroll = new JScrollPane(topPanel);
 		scroll.setBorder(null);
 		scroll.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		scroll.getVerticalScrollBar().setUnitIncrement(16);
 		panel.add(scroll, BorderLayout.CENTER);
+
+		return panel;
+	}
+
+	// --- Split Tab ---
+
+	private JPanel buildSplitTab()
+	{
+		JPanel panel = new JPanel();
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		panel.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
+
+		panel.add(sectionHeader("Split Tracker"));
+		panel.add(createSpacer(2));
+
+		JLabel desc = new JLabel("<html>Submit a split for Discord approval.</html>");
+		desc.setFont(FontManager.getRunescapeSmallFont());
+		desc.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
+		desc.setAlignmentX(LEFT_ALIGNMENT);
+		panel.add(desc);
+		panel.add(createSpacer(8));
+
+		panel.add(fieldLabel("Total amount (gp):"));
+		splitAmountField.setMaximumSize(new Dimension(PANEL_WIDTH, 25));
+		splitAmountField.setAlignmentX(LEFT_ALIGNMENT);
+		splitAmountField.setToolTipText("e.g. 500m, 1.5b, 200k");
+		panel.add(splitAmountField);
+		panel.add(createSpacer(6));
+
+		panel.add(fieldLabel("Split with (comma-separated):"));
+		splitWithField.setMaximumSize(new Dimension(PANEL_WIDTH, 25));
+		splitWithField.setAlignmentX(LEFT_ALIGNMENT);
+		splitWithField.setToolTipText("e.g. PlayerB, PlayerC");
+		panel.add(splitWithField);
+		panel.add(createSpacer(8));
+
+		JPanel buttonGrid = new JPanel(new GridLayout(1, 2, 4, 0));
+		buttonGrid.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		buttonGrid.setAlignmentX(LEFT_ALIGNMENT);
+		buttonGrid.setMaximumSize(new Dimension(PANEL_WIDTH, 28));
+
+		styleButton(splitSubmitButton);
+		splitSubmitButton.addActionListener(e -> onSubmitSplit(false));
+		buttonGrid.add(splitSubmitButton);
+
+		styleButton(splitScreenshotButton);
+		splitScreenshotButton.addActionListener(e -> onSubmitSplit(true));
+		buttonGrid.add(splitScreenshotButton);
+
+		panel.add(buttonGrid);
+		panel.add(createSpacer(6));
+
+		splitStatusLabel.setFont(FontManager.getRunescapeSmallFont());
+		splitStatusLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
+		splitStatusLabel.setAlignmentX(LEFT_ALIGNMENT);
+		panel.add(splitStatusLabel);
 
 		return panel;
 	}
@@ -316,40 +375,36 @@ class ClanEventHubPanel extends PluginPanel
 	{
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 
 		JPanel submitPanel = new JPanel();
 		submitPanel.setLayout(new BoxLayout(submitPanel, BoxLayout.Y_AXIS));
 		submitPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
-		JLabel submitHeader = new JLabel("Submit Drop to Hall of Fame");
-		submitHeader.setFont(FontManager.getRunescapeBoldFont());
-		submitHeader.setForeground(ColorScheme.BRAND_ORANGE);
-		submitHeader.setAlignmentX(LEFT_ALIGNMENT);
-		submitPanel.add(submitHeader);
-		submitPanel.add(createSpacer(5));
+		submitPanel.add(sectionHeader("Hall of Fame"));
+		submitPanel.add(createSpacer(4));
 
-		JLabel dropNameLabel = new JLabel("Drop name:");
-		dropNameLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-		dropNameLabel.setAlignmentX(LEFT_ALIGNMENT);
-		submitPanel.add(dropNameLabel);
-
-		dropTitleField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
+		submitPanel.add(fieldLabel("Drop name:"));
+		dropTitleField.setMaximumSize(new Dimension(PANEL_WIDTH, 25));
 		dropTitleField.setAlignmentX(LEFT_ALIGNMENT);
 		submitPanel.add(dropTitleField);
-		submitPanel.add(createSpacer(5));
+		submitPanel.add(createSpacer(4));
 
-		JPanel dropButtons = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
-		dropButtons.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		dropButtons.setAlignmentX(LEFT_ALIGNMENT);
+		JPanel buttonGrid = new JPanel(new GridLayout(1, 2, 4, 0));
+		buttonGrid.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		buttonGrid.setAlignmentX(LEFT_ALIGNMENT);
+		buttonGrid.setMaximumSize(new Dimension(PANEL_WIDTH, 28));
+
 		styleButton(submitDropButton);
 		submitDropButton.addActionListener(e -> onSubmitDrop());
-		dropButtons.add(submitDropButton);
+		buttonGrid.add(submitDropButton);
+
 		styleButton(refreshDropsButton);
 		refreshDropsButton.addActionListener(e -> onRefreshDrops());
-		dropButtons.add(refreshDropsButton);
-		submitPanel.add(dropButtons);
-		submitPanel.add(createSpacer(10));
+		buttonGrid.add(refreshDropsButton);
+
+		submitPanel.add(buttonGrid);
+		submitPanel.add(createSpacer(8));
 
 		panel.add(submitPanel, BorderLayout.NORTH);
 
@@ -359,6 +414,7 @@ class ClanEventHubPanel extends PluginPanel
 		JScrollPane scrollPane = new JScrollPane(dropsListPanel);
 		scrollPane.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		scrollPane.setBorder(null);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		panel.add(scrollPane, BorderLayout.CENTER);
 
 		return panel;
@@ -370,7 +426,7 @@ class ClanEventHubPanel extends PluginPanel
 	{
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
+		panel.setBorder(new EmptyBorder(8, 8, 8, 8));
 
 		chatMessagesPanel.setLayout(new BoxLayout(chatMessagesPanel, BoxLayout.Y_AXIS));
 		chatMessagesPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
@@ -378,27 +434,28 @@ class ClanEventHubPanel extends PluginPanel
 		JScrollPane scrollPane = new JScrollPane(chatMessagesPanel);
 		scrollPane.setBackground(ColorScheme.DARK_GRAY_COLOR);
 		scrollPane.setBorder(null);
+		scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 		panel.add(scrollPane, BorderLayout.CENTER);
 
-		JPanel inputPanel = new JPanel(new BorderLayout(5, 0));
+		JPanel inputPanel = new JPanel(new BorderLayout(4, 0));
 		inputPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		inputPanel.setBorder(new EmptyBorder(5, 0, 0, 0));
+		inputPanel.setBorder(new EmptyBorder(4, 0, 0, 0));
 
-		chatInputField.setColumns(15);
+		chatInputField.setColumns(12);
 		inputPanel.add(chatInputField, BorderLayout.CENTER);
 
-		JPanel chatButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 3, 0));
-		chatButtonPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
+		JPanel chatButtons = new JPanel(new GridLayout(1, 2, 3, 0));
+		chatButtons.setBackground(ColorScheme.DARK_GRAY_COLOR);
 
 		styleButton(sendChatButton);
 		sendChatButton.addActionListener(e -> onSendChat());
-		chatButtonPanel.add(sendChatButton);
+		chatButtons.add(sendChatButton);
 
 		styleButton(refreshChatButton);
 		refreshChatButton.addActionListener(e -> onRefreshChat());
-		chatButtonPanel.add(refreshChatButton);
+		chatButtons.add(refreshChatButton);
 
-		inputPanel.add(chatButtonPanel, BorderLayout.SOUTH);
+		inputPanel.add(chatButtons, BorderLayout.SOUTH);
 		panel.add(inputPanel, BorderLayout.SOUTH);
 
 		return panel;
@@ -435,20 +492,16 @@ class ClanEventHubPanel extends PluginPanel
 		onRefreshDrops();
 	}
 
-	// --- Active events loading (feeds both Events + Bingo tabs) ---
+	// --- Active events loading ---
 
 	private void loadActiveEvents()
 	{
 		eventsListPanel.removeAll();
-		JLabel loadingLabel = new JLabel("Loading...");
-		loadingLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-		eventsListPanel.add(loadingLabel);
+		eventsListPanel.add(dimLabel("Loading..."));
 		eventsListPanel.revalidate();
 
 		bingoListPanel.removeAll();
-		JLabel bingoLoading = new JLabel("Loading...");
-		bingoLoading.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-		bingoListPanel.add(bingoLoading);
+		bingoListPanel.add(dimLabel("Loading..."));
 		bingoListPanel.revalidate();
 
 		plugin.getApiClient().getActiveEvents(plugin.getApiBase())
@@ -481,15 +534,11 @@ class ClanEventHubPanel extends PluginPanel
 				SwingUtilities.invokeLater(() ->
 				{
 					eventsListPanel.removeAll();
-					JLabel err = new JLabel("Failed to load events");
-					err.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
-					eventsListPanel.add(err);
+					eventsListPanel.add(errorLabel("Failed to load events"));
 					eventsListPanel.revalidate();
 
 					bingoListPanel.removeAll();
-					JLabel bErr = new JLabel("Failed to load boards");
-					bErr.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
-					bingoListPanel.add(bErr);
+					bingoListPanel.add(errorLabel("Failed to load boards"));
 					bingoListPanel.revalidate();
 				});
 				return null;
@@ -502,21 +551,19 @@ class ClanEventHubPanel extends PluginPanel
 
 		if (events.size() == 0)
 		{
-			JLabel empty = new JLabel("No active events");
-			empty.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-			eventsListPanel.add(empty);
+			eventsListPanel.add(dimLabel("No active events"));
 		}
 
 		for (JsonElement el : events)
 		{
 			JsonObject ev = el.getAsJsonObject();
 			String id = getStr(ev, "id");
-			String name = getStr(ev, "name");
-			if (name.isEmpty())
+			String rawName = getStr(ev, "name");
+			if (rawName.isEmpty())
 			{
-				name = "Unknown";
+				rawName = "Unknown";
 			}
-			final String eventName = name;
+			final String eventName = rawName;
 			String type = getStr(ev, "type");
 			if (type.isEmpty())
 			{
@@ -525,38 +572,33 @@ class ClanEventHubPanel extends PluginPanel
 			final String eventType = type;
 			String players = getStr(ev, "players");
 
-			JPanel row = new JPanel(new BorderLayout());
-			row.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-			row.setBorder(BorderFactory.createCompoundBorder(
-				BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
-				new EmptyBorder(5, 8, 5, 8)
-			));
-			row.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
-			row.setAlignmentX(LEFT_ALIGNMENT);
-
 			String typeTag = eventType.replace("_", " ");
 			typeTag = typeTag.substring(0, 1).toUpperCase() + typeTag.substring(1);
 
-			JLabel nameLabel = new JLabel("<html>" + escapeHtml(eventName) + "</html>");
+			JPanel row = new JPanel(new BorderLayout(4, 0));
+			row.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+			row.setBorder(BorderFactory.createCompoundBorder(
+				BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
+				new EmptyBorder(4, 6, 4, 6)
+			));
+			row.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			row.setMaximumSize(new Dimension(PANEL_WIDTH, 36));
+			row.setAlignmentX(LEFT_ALIGNMENT);
+
+			JLabel nameLabel = new JLabel(eventName);
 			nameLabel.setFont(FontManager.getRunescapeSmallFont());
 			nameLabel.setForeground(Color.WHITE);
 			row.add(nameLabel, BorderLayout.CENTER);
 
-			JPanel rightPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
-			rightPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
+			String info = typeTag;
 			if (!players.isEmpty())
 			{
-				JLabel playersLabel = new JLabel(players + "p");
-				playersLabel.setFont(FontManager.getRunescapeSmallFont());
-				playersLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-				rightPanel.add(playersLabel);
+				info = players + "p | " + typeTag;
 			}
-			JLabel typeLabel = new JLabel(typeTag);
-			typeLabel.setFont(FontManager.getRunescapeSmallFont());
-			typeLabel.setForeground(ColorScheme.BRAND_ORANGE);
-			rightPanel.add(typeLabel);
-			row.add(rightPanel, BorderLayout.EAST);
+			JLabel infoLabel = new JLabel(info);
+			infoLabel.setFont(FontManager.getRunescapeSmallFont());
+			infoLabel.setForeground(ColorScheme.BRAND_ORANGE);
+			row.add(infoLabel, BorderLayout.EAST);
 
 			row.addMouseListener(new java.awt.event.MouseAdapter()
 			{
@@ -579,8 +621,6 @@ class ClanEventHubPanel extends PluginPanel
 		selectedEventId = eventId;
 		selectedEventType = type;
 		eventNameLabel.setText(name);
-
-		// Try to load survivor state (works for survivor-type events)
 		refreshSelectedEvent();
 	}
 
@@ -614,7 +654,7 @@ class ClanEventHubPanel extends PluginPanel
 	{
 		if (selectedEventId == null)
 		{
-			showMessage("Select an event from the list first.");
+			showMessage("Select an event first.");
 			return;
 		}
 
@@ -676,7 +716,7 @@ class ClanEventHubPanel extends PluginPanel
 			pointsLabel.setText("Points: " + getStr(me, "total_points"));
 
 			int lifelines = me.has("lifelines") ? me.get("lifelines").getAsInt() : 0;
-			lifelineButton.setText("Use Lifeline (" + lifelines + " left)");
+			lifelineButton.setText("Lifeline (" + lifelines + ")");
 			lifelineButton.setEnabled(lifelines > 0);
 		}
 		else
@@ -711,7 +751,7 @@ class ClanEventHubPanel extends PluginPanel
 			long remaining = countdown.get("remaining").getAsLong();
 			long hours = remaining / 3600000;
 			long minutes = (remaining % 3600000) / 60000;
-			countdownLabel.setText(String.format("Deadline: %dh %dm remaining", hours, minutes));
+			countdownLabel.setText(String.format("Deadline: %dh %dm", hours, minutes));
 			countdownLabel.setForeground(hours < 1 ? ColorScheme.PROGRESS_ERROR_COLOR : ColorScheme.PROGRESS_INPROGRESS_COLOR);
 		}
 		else
@@ -740,11 +780,11 @@ class ClanEventHubPanel extends PluginPanel
 				{
 					String imageUrl = getStr(uploadResult, "full_url");
 
-					plugin.getApiClient().submitProof(plugin.getApiBase(), selectedEventId, sessionToken, imageUrl, "Submitted via RuneLite plugin")
+					plugin.getApiClient().submitProof(plugin.getApiBase(), selectedEventId, sessionToken, imageUrl, "Via RuneLite")
 						.thenAccept(result -> SwingUtilities.invokeLater(() ->
 						{
 							screenshotSubmitButton.setEnabled(true);
-							screenshotSubmitButton.setText("Screenshot & Submit Proof");
+							screenshotSubmitButton.setText("Submit Proof");
 							showMessage("Proof submitted!");
 							refreshSelectedEvent();
 						}))
@@ -753,7 +793,7 @@ class ClanEventHubPanel extends PluginPanel
 							SwingUtilities.invokeLater(() ->
 							{
 								screenshotSubmitButton.setEnabled(true);
-								screenshotSubmitButton.setText("Screenshot & Submit Proof");
+								screenshotSubmitButton.setText("Submit Proof");
 								showMessage("Submit failed: " + ex.getMessage());
 							});
 							return null;
@@ -764,7 +804,7 @@ class ClanEventHubPanel extends PluginPanel
 					SwingUtilities.invokeLater(() ->
 					{
 						screenshotSubmitButton.setEnabled(true);
-						screenshotSubmitButton.setText("Screenshot & Submit Proof");
+						screenshotSubmitButton.setText("Submit Proof");
 						showMessage("Upload failed: " + ex.getMessage());
 					});
 					return null;
@@ -780,7 +820,7 @@ class ClanEventHubPanel extends PluginPanel
 		}
 
 		int confirm = JOptionPane.showConfirmDialog(this,
-			"Are you sure you want to use a lifeline?", "Confirm Lifeline",
+			"Are you sure you want to use a lifeline?", "Confirm",
 			JOptionPane.YES_NO_OPTION);
 		if (confirm != JOptionPane.YES_OPTION)
 		{
@@ -813,9 +853,7 @@ class ClanEventHubPanel extends PluginPanel
 
 		if (bingoEvents.size() == 0)
 		{
-			JLabel empty = new JLabel("No active bingo boards");
-			empty.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-			bingoListPanel.add(empty);
+			bingoListPanel.add(dimLabel("No active bingo boards"));
 		}
 
 		for (JsonElement el : bingoEvents)
@@ -829,14 +867,14 @@ class ClanEventHubPanel extends PluginPanel
 			}
 			final String boardName = name;
 
-			JPanel row = new JPanel(new BorderLayout());
+			JPanel row = new JPanel(new BorderLayout(4, 0));
 			row.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 			row.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
-				new EmptyBorder(5, 8, 5, 8)
+				new EmptyBorder(4, 6, 4, 6)
 			));
 			row.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-			row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 35));
+			row.setMaximumSize(new Dimension(PANEL_WIDTH, 32));
 			row.setAlignmentX(LEFT_ALIGNMENT);
 
 			JLabel nameLabel = new JLabel(boardName);
@@ -864,7 +902,6 @@ class ClanEventHubPanel extends PluginPanel
 		bingoListPanel.revalidate();
 		bingoListPanel.repaint();
 
-		// Auto-select first board
 		if (bingoEvents.size() == 1)
 		{
 			selectBingoBoard(bingoEvents.get(0).getAsJsonObject());
@@ -877,7 +914,6 @@ class ClanEventHubPanel extends PluginPanel
 		String name = getStr(board, "name");
 		bingoNameLabel.setText(name.isEmpty() ? selectedBoardId : name);
 
-		// Detect player's team
 		String rsn = plugin.getLocalPlayerName();
 		String myTeamId = null;
 		String myTeamName = null;
@@ -913,7 +949,6 @@ class ClanEventHubPanel extends PluginPanel
 			bingoNameLabel.setText(bingoNameLabel.getText() + " - " + myTeamName);
 		}
 
-		// Load tiles
 		bingoTilesPanel.removeAll();
 		bingoTileSelector.removeAllItems();
 		currentBingoTiles = board.has("tiles") ? board.getAsJsonArray("tiles") : new JsonArray();
@@ -926,24 +961,22 @@ class ClanEventHubPanel extends PluginPanel
 			int points = tile.has("points") ? tile.get("points").getAsInt() : 0;
 			boolean completed = tile.has("completed") && tile.get("completed").getAsBoolean();
 
-			JPanel tileRow = new JPanel(new BorderLayout());
+			JPanel tileRow = new JPanel(new BorderLayout(4, 0));
 			tileRow.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-			tileRow.setBorder(new EmptyBorder(3, 5, 3, 5));
-			tileRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+			tileRow.setBorder(new EmptyBorder(2, 4, 2, 4));
+			tileRow.setMaximumSize(new Dimension(PANEL_WIDTH, 24));
 			tileRow.setAlignmentX(LEFT_ALIGNMENT);
 
-			JLabel tileLabel = new JLabel(item + " (" + points + "pts)");
+			JLabel tileLabel = new JLabel(item);
 			tileLabel.setFont(FontManager.getRunescapeSmallFont());
 			tileLabel.setForeground(completed ? ColorScheme.PROGRESS_COMPLETE_COLOR : Color.WHITE);
 			tileRow.add(tileLabel, BorderLayout.CENTER);
 
-			if (completed)
-			{
-				JLabel check = new JLabel("Done");
-				check.setFont(FontManager.getRunescapeSmallFont());
-				check.setForeground(ColorScheme.PROGRESS_COMPLETE_COLOR);
-				tileRow.add(check, BorderLayout.EAST);
-			}
+			String rightText = completed ? "Done" : points + "pts";
+			JLabel rightLabel = new JLabel(rightText);
+			rightLabel.setFont(FontManager.getRunescapeSmallFont());
+			rightLabel.setForeground(completed ? ColorScheme.PROGRESS_COMPLETE_COLOR : ColorScheme.LIGHT_GRAY_COLOR);
+			tileRow.add(rightLabel, BorderLayout.EAST);
 
 			bingoTilesPanel.add(tileRow);
 
@@ -982,11 +1015,10 @@ class ClanEventHubPanel extends PluginPanel
 		String botSecret = config.botSecret();
 		if (sessionToken == null && botSecret.isEmpty())
 		{
-			showMessage("Set Bot Secret in plugin config, or join a survivor event first for auth.");
+			showMessage("Set Bot Secret in config, or join an event first.");
 			return;
 		}
 
-		// Parse tile ID from selector text ("123 - Item Name")
 		String selected = (String) bingoTileSelector.getSelectedItem();
 		int tileId;
 		try
@@ -1006,12 +1038,12 @@ class ClanEventHubPanel extends PluginPanel
 		{
 			SwingUtilities.invokeLater(() -> bingoSubmitButton.setText("Uploading..."));
 
-			plugin.getApiClient().submitBingoProof(plugin.getApiBase(), 
+			plugin.getApiClient().submitBingoProof(plugin.getApiBase(),
 				selectedBoardId, tileId, rsn, image, sessionToken, botSecret)
 				.thenAccept(result -> SwingUtilities.invokeLater(() ->
 				{
 					bingoSubmitButton.setEnabled(true);
-					bingoSubmitButton.setText("Screenshot & Submit Tile");
+					bingoSubmitButton.setText("Submit Tile Proof");
 					showMessage("Bingo proof submitted!");
 					loadActiveEvents();
 				}))
@@ -1020,7 +1052,7 @@ class ClanEventHubPanel extends PluginPanel
 					SwingUtilities.invokeLater(() ->
 					{
 						bingoSubmitButton.setEnabled(true);
-						bingoSubmitButton.setText("Screenshot & Submit Tile");
+						bingoSubmitButton.setText("Submit Tile Proof");
 						showMessage("Failed: " + ex.getMessage());
 					});
 					return null;
@@ -1029,69 +1061,6 @@ class ClanEventHubPanel extends PluginPanel
 	}
 
 	// --- Splits ---
-
-	private JPanel buildSplitTab()
-	{
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-		panel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
-
-		JLabel header = new JLabel("Split Tracker");
-		header.setFont(FontManager.getRunescapeBoldFont());
-		header.setForeground(ColorScheme.BRAND_ORANGE);
-		header.setAlignmentX(LEFT_ALIGNMENT);
-		panel.add(header);
-		panel.add(createSpacer(3));
-
-		JLabel desc = new JLabel("<html>Submit a split for approval in Discord.</html>");
-		desc.setFont(FontManager.getRunescapeSmallFont());
-		desc.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-		desc.setAlignmentX(LEFT_ALIGNMENT);
-		panel.add(desc);
-		panel.add(createSpacer(10));
-
-		JLabel amountLabel = new JLabel("Total amount (gp):");
-		amountLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-		amountLabel.setAlignmentX(LEFT_ALIGNMENT);
-		panel.add(amountLabel);
-
-		splitAmountField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-		splitAmountField.setAlignmentX(LEFT_ALIGNMENT);
-		splitAmountField.setToolTipText("e.g. 500000000 or 500m");
-		panel.add(splitAmountField);
-		panel.add(createSpacer(8));
-
-		JLabel splitWithLabel = new JLabel("Split with (comma-separated IGNs):");
-		splitWithLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-		splitWithLabel.setAlignmentX(LEFT_ALIGNMENT);
-		panel.add(splitWithLabel);
-
-		splitWithField.setMaximumSize(new Dimension(Integer.MAX_VALUE, 25));
-		splitWithField.setAlignmentX(LEFT_ALIGNMENT);
-		splitWithField.setToolTipText("e.g. PlayerB, PlayerC");
-		panel.add(splitWithField);
-		panel.add(createSpacer(10));
-
-		styleButton(splitSubmitButton);
-		splitSubmitButton.setAlignmentX(LEFT_ALIGNMENT);
-		splitSubmitButton.addActionListener(e -> onSubmitSplit(false));
-		panel.add(splitSubmitButton);
-		panel.add(createSpacer(5));
-
-		styleButton(splitScreenshotButton);
-		splitScreenshotButton.setAlignmentX(LEFT_ALIGNMENT);
-		splitScreenshotButton.addActionListener(e -> onSubmitSplit(true));
-		panel.add(splitScreenshotButton);
-		panel.add(createSpacer(8));
-
-		splitStatusLabel.setFont(FontManager.getRunescapeSmallFont());
-		splitStatusLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-		splitStatusLabel.setAlignmentX(LEFT_ALIGNMENT);
-		panel.add(splitStatusLabel);
-
-		return panel;
-	}
 
 	private void onSubmitSplit(boolean withScreenshot)
 	{
@@ -1105,7 +1074,7 @@ class ClanEventHubPanel extends PluginPanel
 		long amount = parseGpAmount(splitAmountField.getText().trim());
 		if (amount <= 0)
 		{
-			showMessage("Enter a valid GP amount (e.g. 500000000 or 500m).");
+			showMessage("Enter a valid GP amount.");
 			return;
 		}
 
@@ -1261,9 +1230,9 @@ class ClanEventHubPanel extends PluginPanel
 						.thenAccept(result -> SwingUtilities.invokeLater(() ->
 						{
 							submitDropButton.setEnabled(true);
-							submitDropButton.setText("Screenshot & Submit Drop");
+							submitDropButton.setText("Submit Drop");
 							dropTitleField.setText("");
-							showMessage("Drop submitted to Hall of Fame!");
+							showMessage("Drop submitted!");
 							onRefreshDrops();
 						}))
 						.exceptionally(ex ->
@@ -1271,7 +1240,7 @@ class ClanEventHubPanel extends PluginPanel
 							SwingUtilities.invokeLater(() ->
 							{
 								submitDropButton.setEnabled(true);
-								submitDropButton.setText("Screenshot & Submit Drop");
+								submitDropButton.setText("Submit Drop");
 								showMessage("Submit failed: " + ex.getMessage());
 							});
 							return null;
@@ -1282,7 +1251,7 @@ class ClanEventHubPanel extends PluginPanel
 					SwingUtilities.invokeLater(() ->
 					{
 						submitDropButton.setEnabled(true);
-						submitDropButton.setText("Screenshot & Submit Drop");
+						submitDropButton.setText("Submit Drop");
 						showMessage("Upload failed: " + ex.getMessage());
 					});
 					return null;
@@ -1313,9 +1282,7 @@ class ClanEventHubPanel extends PluginPanel
 
 		if (drops.size() == 0)
 		{
-			JLabel empty = new JLabel("No drops yet");
-			empty.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-			dropsListPanel.add(empty);
+			dropsListPanel.add(dimLabel("No drops yet"));
 		}
 
 		for (JsonElement el : drops)
@@ -1325,7 +1292,7 @@ class ClanEventHubPanel extends PluginPanel
 			dropPanel.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 			dropPanel.setBorder(BorderFactory.createCompoundBorder(
 				BorderFactory.createMatteBorder(0, 0, 1, 0, ColorScheme.DARK_GRAY_COLOR),
-				new EmptyBorder(5, 5, 5, 5)
+				new EmptyBorder(4, 5, 4, 5)
 			));
 
 			String dropTitle = getStr(drop, "title");
@@ -1335,7 +1302,7 @@ class ClanEventHubPanel extends PluginPanel
 			JLabel titleLabel = new JLabel(dropTitle.isEmpty() ? "Unknown" : dropTitle);
 			titleLabel.setFont(FontManager.getRunescapeSmallFont());
 			titleLabel.setForeground(ColorScheme.GRAND_EXCHANGE_PRICE);
-			dropPanel.add(titleLabel, BorderLayout.NORTH);
+			dropPanel.add(titleLabel, BorderLayout.CENTER);
 
 			String detail = player + (date.length() >= 10 ? " - " + date.substring(0, 10) : "");
 			JLabel detailLabel = new JLabel(detail);
@@ -1343,7 +1310,7 @@ class ClanEventHubPanel extends PluginPanel
 			detailLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
 			dropPanel.add(detailLabel, BorderLayout.SOUTH);
 
-			dropPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45));
+			dropPanel.setMaximumSize(new Dimension(PANEL_WIDTH, 40));
 			dropPanel.setAlignmentX(LEFT_ALIGNMENT);
 			dropsListPanel.add(dropPanel);
 		}
@@ -1465,11 +1432,45 @@ class ClanEventHubPanel extends PluginPanel
 		return obj.has(key) && !obj.get(key).isJsonNull() ? obj.get(key).getAsString() : "";
 	}
 
+	private JLabel sectionHeader(String text)
+	{
+		JLabel label = new JLabel(text);
+		label.setFont(FontManager.getRunescapeBoldFont());
+		label.setForeground(ColorScheme.BRAND_ORANGE);
+		label.setAlignmentX(LEFT_ALIGNMENT);
+		return label;
+	}
+
+	private JLabel fieldLabel(String text)
+	{
+		JLabel label = new JLabel(text);
+		label.setFont(FontManager.getRunescapeSmallFont());
+		label.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
+		label.setAlignmentX(LEFT_ALIGNMENT);
+		return label;
+	}
+
+	private JLabel dimLabel(String text)
+	{
+		JLabel label = new JLabel(text);
+		label.setFont(FontManager.getRunescapeSmallFont());
+		label.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
+		return label;
+	}
+
+	private JLabel errorLabel(String text)
+	{
+		JLabel label = new JLabel(text);
+		label.setFont(FontManager.getRunescapeSmallFont());
+		label.setForeground(ColorScheme.PROGRESS_ERROR_COLOR);
+		return label;
+	}
+
 	private JPanel createSpacer(int height)
 	{
 		JPanel spacer = new JPanel();
 		spacer.setBackground(ColorScheme.DARK_GRAY_COLOR);
-		spacer.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
+		spacer.setMaximumSize(new Dimension(PANEL_WIDTH, height));
 		spacer.setPreferredSize(new Dimension(0, height));
 		spacer.setAlignmentX(LEFT_ALIGNMENT);
 		return spacer;
@@ -1478,11 +1479,12 @@ class ClanEventHubPanel extends PluginPanel
 	private void styleButton(JButton button)
 	{
 		button.setFocusPainted(false);
+		button.setFont(FontManager.getRunescapeSmallFont());
 		button.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		button.setForeground(Color.WHITE);
 		button.setBorder(BorderFactory.createCompoundBorder(
 			BorderFactory.createLineBorder(ColorScheme.MEDIUM_GRAY_COLOR),
-			new EmptyBorder(5, 10, 5, 10)
+			new EmptyBorder(4, 8, 4, 8)
 		));
 	}
 
