@@ -7,7 +7,7 @@ This plugin is not affiliated with or endorsed by Jagex.
 > **Privacy:**
 > This plugin does not send any data unless the user explicitly configures external endpoints in the settings.
 > No data is collected, stored, or transmitted by default.
-> All communication is initiated by explicit user actions (e.g., submitting proof, joining events).
+> All communication is triggered by explicit user actions (e.g., clicking submit) or by optional features the user must manually enable (e.g., auto-submit drops, which is off by default).
 > All authentication tokens are stored locally within the RuneLite client and are never shared except with user-configured endpoints.
 
 ## Features
