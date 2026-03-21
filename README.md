@@ -56,7 +56,7 @@ This plugin is not affiliated with or endorsed by Jagex.
 
 ## Server Setup Guide
 
-This section is for **clan server admins** who want to build a compatible backend. The plugin communicates with a standard REST API over HTTPS. You can implement this in any language (Node.js, Python, Java, etc.).
+This section is for **clan server admins** who want to build a compatible backend. The plugin communicates with standard REST endpoints. You can implement this in any language (Node.js, Python, Java, etc.). HTTPS is recommended but not required.
 
 ### Authentication
 
@@ -353,7 +353,6 @@ Add a drop to the Hall of Fame.
 {
   "title": "Dragon Warhammer",
   "player": "PlayerRSN",
-  "description": "",
   "image": "https://yourclan.com/uploads/screenshot.png",
   "category": "drop"
 }
@@ -405,11 +404,23 @@ const upload = multer({ dest: 'uploads/' });
 
 app.use(express.json());
 
+// Session store (replace with database in production)
+const sessions = new Map();
+
 // Auth middleware
 function auth(req, res, next) {
-  const token = req.headers['x-session-token'];
   const secret = req.headers['x-bot-secret'];
-  if (token || secret === process.env.BOT_SECRET) return next();
+  if (secret && secret === process.env.BOT_SECRET) {
+    req.username = req.body?.submittedBy || 'Bot';
+    return next();
+  }
+
+  const token = req.headers['x-session-token'];
+  if (token && sessions.has(token)) {
+    req.username = sessions.get(token);
+    return next();
+  }
+
   res.status(401).json({ error: 'Unauthorized' });
 }
 

@@ -219,7 +219,6 @@ public class ClanEventHubClient
 		JsonObject body = new JsonObject();
 		body.addProperty("title", title);
 		body.addProperty("player", player);
-		body.addProperty("description", "");
 		body.addProperty("image", imageUrl);
 		body.addProperty("category", "drop");
 		return postJson(apiBase + "/hall-of-fame", null, botSecret, body);
