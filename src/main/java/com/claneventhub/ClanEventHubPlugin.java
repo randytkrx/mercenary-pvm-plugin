@@ -31,9 +31,9 @@ import net.runelite.client.util.ImageUtil;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Mercenary PvM",
+	name = "Mercenary",
 	description = "Track clan events, bingo, splits, and drops via your clan's server",
-	tags = {"mercenary", "pvm", "clan", "events", "bingo", "drops", "splits", "loot", "proof"}
+	tags = {"mercenary", "clan", "events", "bingo", "drops", "splits", "loot", "proof"}
 )
 public class ClanEventHubPlugin extends Plugin
 {
@@ -84,7 +84,7 @@ public class ClanEventHubPlugin extends Plugin
 		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "icon.png");
 
 		navButton = NavigationButton.builder()
-			.tooltip("Mercenary PvM")
+			.tooltip("Mercenary")
 			.icon(icon)
 			.priority(7)
 			.panel(panel)
